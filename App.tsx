@@ -3,9 +3,12 @@ import { ThemeProvider } from 'styled-components'
 import theme from './src/global/styles/theme';
 import { Dashboard } from './src/screens/Dashboard';
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_700Bold } from '@expo-google-fonts/poppins';
-import AppLoading from 'expo-app-loading';
+import * as SplashScreen from 'expo-splash-screen'
 
 export default function App() {
+
+  SplashScreen.preventAutoHideAsync();
+
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
@@ -14,8 +17,10 @@ export default function App() {
 
   // segura a tela de splash enquanto as fontes não forem carregadas
   if (!fontsLoaded) {
-    return <AppLoading />
+    return null
   }
+
+  SplashScreen.hideAsync();
 
   return (
     <ThemeProvider theme={theme}>
