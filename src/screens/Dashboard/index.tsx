@@ -1,4 +1,6 @@
 import React from 'react';
+import { Feather } from '@expo/vector-icons'
+
 import {
     Container,
     Header,
@@ -8,9 +10,8 @@ import {
     User,
     UserGreeting,
     UserName,
+    Icon
 } from './styles'
-
-import { Text } from 'react-native';
 
 export function Dashboard() {
     return (
@@ -20,10 +21,11 @@ export function Dashboard() {
                     <UserInfo>
                         <Photo source={{ uri: 'https://avatars.githubusercontent.com/u/70413248?v=4' }} />
                         <User>
-                            <UserGreeting>Ola, </UserGreeting>
+                            <UserGreeting>Olá, </UserGreeting>
                             <UserName>Cicero</UserName>
                         </User>
                     </UserInfo>
+                    <Icon name="power" />
                 </UserWrapper>
             </Header>
         </Container>
