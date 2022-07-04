@@ -28,6 +28,7 @@ export const Title = styled.Text<TypeProps>`
 
 export const Icon = styled(Feather) <TypeProps>`
     font-size: ${RFValue(40)}px;
+
     ${({ type }) => type === 'up' && css`
     color: ${({ theme }) => theme.colors.success};
   `};
