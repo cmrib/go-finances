@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Keyboard, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { Container, Header, Title, Form, Fields, TransactionsTypes } from './styles';
@@ -9,6 +9,7 @@ import { CategorySelectButton } from '../../components/Form/CategorySelectButton
 import { CategorySelect } from '../CategorySelect/';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface FormData {
     [key: string]: string;
@@ -26,6 +27,8 @@ const schema = Yup.object().shape({
 });
 
 export function Register() {
+
+    const dataKey = '@gofinances:transactions';
 
     const [transactionType, setTransactionType] = useState('');
     const [categoryModalOpen, setCategoryModalOpen] = useState(false);
@@ -49,7 +52,7 @@ export function Register() {
         setCategoryModalOpen(false);
     }
 
-    function handleRegister(form: FormData) {
+    async function handleRegister(form: FormData) {
 
         if (!transactionType) {
             return Alert.alert('Selecione um tipo de despesa.');
@@ -57,16 +60,38 @@ export function Register() {
 
         if (category.key === 'category') {
             return Alert.alert('Selecione uma categoria.');
-        }
+        };
 
-        const data = {
+        const newTransaction = {
             name: form.name,
             amount: form.amount,
             transactionType,
             category: category.key
+        };
+
+        try {
+            const data = await AsyncStorage.getItem(dataKey);
+            const currentData = data ? JSON.parse(data) : [];
+            const dataFormatted = [
+                ...currentData,
+                newTransaction
+            ]
+            await AsyncStorage.setItem(dataKey, JSON.stringify(dataFormatted));
+        } catch (error) {
+            console.log(error);
+            Alert.alert("Não foi possível salvar a transação");
         }
-        console.log(data);
     }
+
+    useEffect(() => {
+
+        async function loadData() {
+            const data = await AsyncStorage.getItem(dataKey)
+            const dataJSON = JSON.parse(data!) // ! força typescript dizer que não vai ser undefined
+            console.log(dataJSON)
+        }
+        loadData()
+    }, [])
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
