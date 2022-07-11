@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Keyboard, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { Container, Header, Title, Form, Fields, TransactionsTypes } from './styles';
@@ -10,10 +10,17 @@ import { CategorySelect } from '../CategorySelect/';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
+import { useNavigation } from '@react-navigation/native';
 
 interface FormData {
     [key: string]: string;
 };
+
+type NavigationProps = {
+    navigate: (screen: string) => void;
+}
+
 
 const schema = Yup.object().shape({
     name: Yup
@@ -37,7 +44,9 @@ export function Register() {
         name: 'Categoria',
     })
 
-    const { control, handleSubmit, formState: { errors } } = useForm({
+    const navigation = useNavigation<NavigationProps>()
+
+    const { control, handleSubmit, reset, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
     });
 
@@ -63,10 +72,12 @@ export function Register() {
         };
 
         const newTransaction = {
+            id: String(uuid.v4()),
             name: form.name,
             amount: form.amount,
             transactionType,
-            category: category.key
+            category: category.key,
+            date: new Date()
         };
 
         try {
@@ -77,21 +88,21 @@ export function Register() {
                 newTransaction
             ]
             await AsyncStorage.setItem(dataKey, JSON.stringify(dataFormatted));
+
+            // resetando campos
+            setTransactionType('');
+            setCategory({
+                key: 'category',
+                name: 'Categoria',
+            })
+            reset();
+            navigation.navigate('Listagem')
+
         } catch (error) {
             console.log(error);
             Alert.alert("Não foi possível salvar a transação");
         }
     }
-
-    useEffect(() => {
-
-        async function loadData() {
-            const data = await AsyncStorage.getItem(dataKey)
-            const dataJSON = JSON.parse(data!) // ! força typescript dizer que não vai ser undefined
-            console.log(dataJSON)
-        }
-        loadData()
-    }, [])
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
