@@ -1,25 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { HighlightCard } from '../../components/HighlightCard';
 import { TransactionCard, TransactionCardProps } from '../../components/TransactionCard';
-import {
-    Container,
-    Header,
-    UserWrapper,
-    UserInfo,
-    Photo,
-    User,
-    UserGreeting,
-    UserName,
-    Icon,
-    HighlightCards,
-    Transactions,
-    Title,
-    TransactionsList,
-    LogoutButton
-
-} from './styles'
+import { Container, Header, UserWrapper, UserInfo, Photo, User, UserGreeting, UserName, Icon, HighlightCards, Transactions, Title, TransactionsList, LogoutButton } from './styles'
 import { dataKey } from '../../utils/collections'
+import { useFocusEffect } from '@react-navigation/native'
 
 export interface DataListProps extends TransactionCardProps {
     id: string;
@@ -60,8 +45,12 @@ export function Dashboard() {
 
     useEffect(() => {
         loadData()
-    },
-        [])
+    }, [])
+
+    // busca os dados quando o componente está em foco
+    useFocusEffect(useCallback(() => {
+        loadData()
+    }, []))
 
     return (
         <Container >
