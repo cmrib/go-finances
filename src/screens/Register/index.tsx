@@ -12,6 +12,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
 import { useNavigation } from '@react-navigation/native';
+import { dataKey } from '../../utils/collections'
 
 interface FormData {
     [key: string]: string;
@@ -35,7 +36,6 @@ const schema = Yup.object().shape({
 
 export function Register() {
 
-    const dataKey = '@gofinances:transactions';
 
     const [transactionType, setTransactionType] = useState('');
     const [categoryModalOpen, setCategoryModalOpen] = useState(false);
