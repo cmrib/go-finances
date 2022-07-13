@@ -94,3 +94,10 @@ export const TransactionsList = styled(
         paddingBottom: getBottomSpace()
     }
 })``;
+
+export const LoadContainer = styled.View`
+    width: 100%;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+`;
