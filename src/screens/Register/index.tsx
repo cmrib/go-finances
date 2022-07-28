@@ -96,7 +96,7 @@ export function Register() {
                 name: 'Categoria',
             })
             reset();
-            navigation.navigate('Listagem')
+            navigation.navigate('Dashboard')
 
         } catch (error) {
             console.log(error);
