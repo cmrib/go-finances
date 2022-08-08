@@ -24,11 +24,11 @@ export function AppRoutes() {
             }
         }}>
             <Screen
-                name="Resumo"
-                component={Resume}
+                name="Dashboard"
+                component={Dashboard}
                 options={{
                     tabBarIcon: ({ color, size }) => (
-                        <MaterialIcons name="pie-chart" color={color} size={size} />
+                        <MaterialIcons name="list" color={color} size={size} />
                     )
                 }}
             />
@@ -43,11 +43,11 @@ export function AppRoutes() {
                 }} />
 
             <Screen
-                name="Dashboard"
-                component={Dashboard}
+                name="Resumo"
+                component={Resume}
                 options={{
                     tabBarIcon: ({ color, size }) => (
-                        <MaterialIcons name="list" color={color} size={size} />
+                        <MaterialIcons name="pie-chart" color={color} size={size} />
                     )
                 }}
             />
