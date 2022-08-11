@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useState, useEffect } from "react";
 import * as AuthSession from 'expo-auth-session';
 import * as AppleAuthentication from 'expo-apple-authentication'
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -14,7 +14,7 @@ interface AuthProviderProps {
 interface AuthContextData {
     user: User;
     signInWithGoogle(): Promise<void>
-    signInWithApple(): Promise<void>
+    // signInWithApple(): Promise<void>
 }
 
 interface User {
@@ -37,7 +37,9 @@ const AuthContext = createContext({} as AuthContextData)
 
 function AuthProvider({ children }: AuthProviderProps) {
 
-    const [user, setUser] = useState<User>({} as User)
+    const [user, setUser] = useState<User>({} as User);
+    const userStorageKey = '@gofinances:user';
+    const [userStorageLoading, setUserStorageLoading] = useState(true)
 
 
     async function signInWithGoogle() {
@@ -51,12 +53,15 @@ function AuthProvider({ children }: AuthProviderProps) {
             if (type === 'success') {
                 const response = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${params.access_token}`);
                 const userInfo = await response.json();
-                setUser({
+
+                const userLogged: User = {
                     id: userInfo.id,
                     email: userInfo.email,
                     name: userInfo.given_name,
                     photo: userInfo.picture
-                })
+                }
+                setUser(userLogged)
+                await AsyncStorage.setItem(userStorageKey, JSON.stringify(userLogged))
             }
 
         } catch (error: any) {
@@ -64,34 +69,46 @@ function AuthProvider({ children }: AuthProviderProps) {
         }
     }
 
-    async function signInWithApple() {
-        try {
-            const credential = await AppleAuthentication.signInAsync({
-                requestedScopes: [
-                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
-                ]
-            })
+    // async function signInWithApple() {
+    //     try {
+    //         const credential = await AppleAuthentication.signInAsync({
+    //             requestedScopes: [
+    //                 AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+    //                 AppleAuthentication.AppleAuthenticationScope.EMAIL,
+    //             ]
+    //         })
 
-            if (credential) {
-                const userLogged = {
-                    id: String(credential.user),
-                    email: credential.email!,
-                    name: credential.fullName!.givenName!,
-                    photo: undefined
-                }
-                setUser(userLogged);
-                await AsyncStorage.setItem('@gofinances:user', JSON.stringify(userLogged))
+    //         if (credential) {
+    //             const userLogged = {
+    //                 id: String(credential.user),
+    //                 email: credential.email!,
+    //                 name: credential.fullName!.givenName!,
+    //                 photo: undefined
+    //             }
+    //             setUser(userLogged);
+    //             await AsyncStorage.setItem(userStorageKey, JSON.stringify(userLogged))
+    //         }
+
+
+    //     } catch (error: any) {
+    //         throw new Error(error);
+    //     }
+    // }
+
+    useEffect(() => {
+        async function loadUserStorageData() {
+            const userStorage = await AsyncStorage.getItem(userStorageKey);
+            if (userStorage) {
+                const userLogged = JSON.parse(userStorage) as User
+                setUser(userLogged)
             }
-
-
-        } catch (error: any) {
-            throw new Error(error);
+            setUserStorageLoading(false)
         }
-    }
+        loadUserStorageData()
+    }, [])
 
     return (
-        <AuthContext.Provider value={{ user, signInWithGoogle, signInWithApple }}>
+        <AuthContext.Provider value={{ user, signInWithGoogle }}>
             {children}
         </AuthContext.Provider>
     )
