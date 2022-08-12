@@ -7,6 +7,7 @@ import { dataKey } from '../../utils/collections';
 import { useFocusEffect } from '@react-navigation/native';
 import { ActivityIndicator } from 'react-native';
 import { useTheme } from 'styled-components';
+import { useAuth } from '../../hooks/auth';
 
 export interface DataListProps extends TransactionCardProps {
     id: string;
@@ -28,7 +29,8 @@ export function Dashboard() {
     const theme = useTheme()
     const [isLoading, setIsLoading] = useState(true)
     const [transactions, setTransactions] = useState<DataListProps[]>([]);
-    const [highlightData, setHighlightData] = useState<HightlightData>({} as HightlightData)
+    const [highlightData, setHighlightData] = useState<HightlightData>({} as HightlightData);
+    const { signOut } = useAuth()
 
 
     function getLastTransactionDate(
@@ -140,7 +142,7 @@ export function Dashboard() {
                             </User>
                         </UserInfo>
 
-                        <LogoutButton>
+                        <LogoutButton onPress={signOut}>
                             <Icon name="power" />
                         </LogoutButton>
                     </UserWrapper>

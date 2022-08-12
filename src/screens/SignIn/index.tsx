@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Header, TitleWrapper, Title, SignInTitle, Footer, FooterWrapper } from './styles';
 import AppleSvg from '../../assets/apple.svg'
 import GoogleSvg from '../../assets/google.svg'
@@ -6,27 +6,36 @@ import LogoSvg from '../../assets/logo.svg'
 import { RFValue } from 'react-native-responsive-fontsize';
 import { SignInSocialButton } from '../../components/SignInSocialButton';
 import { useAuth } from '../../hooks/auth';
-import { Alert } from 'react-native';
+import { ActivityIndicator, Alert } from 'react-native';
+import { useTheme } from 'styled-components';
 
 export function SignIn() {
 
-    const { signInWithGoogle } = useAuth()
+    const [isLoading, setIsLoading] = useState(false)
+    const { signInWithGoogle } = useAuth();
+    const theme = useTheme()
 
     async function handleSignInWithGoogle() {
         try {
+            setIsLoading(true)
             await signInWithGoogle();
         } catch (error) {
             console.log(error)
             Alert.alert('Não foi possível conectar a conta Google')
+        } finally {
+            //setIsLoading(false)
         }
     }
 
     // async function handleSignInWithApple() {
     //     try {
-    //         await signInWithApple();
+    //         setIsLoading(true);
+    //         return await signInWithApple();
     //     } catch (error) {
     //         console.log(error)
     //         Alert.alert('Não foi possível conectar a conta Apple')
+    //     } finally {
+    //         setIsLoading(false)
     //     }
     // }
 
@@ -54,8 +63,10 @@ export function SignIn() {
                     <SignInSocialButton title="Entrar com Google" onPress={handleSignInWithGoogle} svg={GoogleSvg} />
                     <SignInSocialButton title="Entrar com Apple" svg={AppleSvg} />
                 </FooterWrapper>
-            </Footer>
 
+                {isLoading && <ActivityIndicator color={theme.colors.shape} style={{ marginTop: 18 }} />}
+
+            </Footer>
         </Container>
     );
 }

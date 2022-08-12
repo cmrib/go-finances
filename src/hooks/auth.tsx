@@ -15,6 +15,8 @@ interface AuthContextData {
     user: User;
     signInWithGoogle(): Promise<void>
     // signInWithApple(): Promise<void>
+    signOut(): Promise<void>;
+    userStorageLoading: boolean;
 }
 
 interface User {
@@ -69,31 +71,36 @@ function AuthProvider({ children }: AuthProviderProps) {
         }
     }
 
-    // async function signInWithApple() {
-    //     try {
-    //         const credential = await AppleAuthentication.signInAsync({
-    //             requestedScopes: [
-    //                 AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-    //                 AppleAuthentication.AppleAuthenticationScope.EMAIL,
-    //             ]
-    //         })
+    async function signInWithApple() {
+        try {
+            const credential = await AppleAuthentication.signInAsync({
+                requestedScopes: [
+                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
+                ]
+            })
 
-    //         if (credential) {
-    //             const userLogged = {
-    //                 id: String(credential.user),
-    //                 email: credential.email!,
-    //                 name: credential.fullName!.givenName!,
-    //                 photo: undefined
-    //             }
-    //             setUser(userLogged);
-    //             await AsyncStorage.setItem(userStorageKey, JSON.stringify(userLogged))
-    //         }
+            if (credential) {
+                const userLogged = {
+                    id: String(credential.user),
+                    email: credential.email!,
+                    name: credential.fullName!.givenName!,
+                    photo: undefined
+                }
+                setUser(userLogged);
+                await AsyncStorage.setItem(userStorageKey, JSON.stringify(userLogged))
+            }
 
 
-    //     } catch (error: any) {
-    //         throw new Error(error);
-    //     }
-    // }
+        } catch (error: any) {
+            throw new Error(error);
+        }
+    }
+
+    async function signOut() {
+        setUser({} as User);
+        await AsyncStorage.removeItem(userStorageKey)
+    }
 
     useEffect(() => {
         async function loadUserStorageData() {
@@ -108,7 +115,7 @@ function AuthProvider({ children }: AuthProviderProps) {
     }, [])
 
     return (
-        <AuthContext.Provider value={{ user, signInWithGoogle }}>
+        <AuthContext.Provider value={{ user, signInWithGoogle, signOut, userStorageLoading }}>
             {children}
         </AuthContext.Provider>
     )

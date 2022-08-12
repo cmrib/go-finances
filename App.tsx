@@ -9,7 +9,7 @@ import { AppRoutes } from './src/routes/app.routes';
 import { Routes } from './src/routes/';
 import { StatusBar } from 'react-native'
 import { SignIn } from './src/screens/SignIn';
-import { AuthProvider } from './src/hooks/auth'
+import { AuthProvider, useAuth } from './src/hooks/auth'
 
 export default function App() {
 
@@ -21,8 +21,10 @@ export default function App() {
     Poppins_700Bold
   })
 
+  const { userStorageLoading } = useAuth()
+
   // segura a tela de splash enquanto as fontes não forem carregadas
-  if (!fontsLoaded) {
+  if (!fontsLoaded || userStorageLoading) {
     return null
   }
 
