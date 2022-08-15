@@ -35,10 +35,17 @@ export function Dashboard() {
     function getLastTransactionDate(
         collection: DataListProps[],
         type: 'positive' | 'negative') {
+
+        const collectionFilttered = collection.filter((transaction) => transaction.type === type);
         // Descobre a transação mais recente
-        const lastTransaction = new Date(Math.max.apply(Math, collection
-            .filter((transaction) => transaction.type === type)
-            .map((transaction) => new Date(transaction.date).getTime()))
+        if (collectionFilttered.length === 0) {
+            return 0
+        }
+
+        const lastTransaction = new Date(Math.max.apply(Math,
+            collectionFilttered
+                .filter((transaction) => transaction.type === type)
+                .map((transaction) => new Date(transaction.date).getTime()))
         )
 
         return `${lastTransaction.getDate()} de ${lastTransaction.toLocaleString('pt-BR', { month: 'long' })} `
@@ -85,7 +92,7 @@ export function Dashboard() {
         setTransactions(transactionsFormatted);
         const lastTransactionEntrie = getLastTransactionDate(transactions, 'positive');
         const lastTransactionExpensives = getLastTransactionDate(transactions, 'negative');
-        const totalInterval = `01 a ${lastTransactionExpensives}`
+        const totalInterval = lastTransactionExpensives === 0 ? 'Não há transações' : `01 a ${lastTransactionExpensives}`
 
         const total = entriesTotal - expensiveTotal
 
@@ -95,7 +102,7 @@ export function Dashboard() {
                     style: 'currency',
                     currency: 'BRL'
                 }),
-                lastTransaction: `Última entrada dia ${lastTransactionEntrie}`
+                lastTransaction: lastTransactionEntrie === 0 ? 'Não há transações' : `Última entrada dia ${lastTransactionEntrie}`
 
             },
 
@@ -104,7 +111,7 @@ export function Dashboard() {
                     style: 'currency',
                     currency: 'BRL'
                 }),
-                lastTransaction: `Última saída dia ${lastTransactionExpensives}`
+                lastTransaction: lastTransactionExpensives === 0 ? 'Não há transações' : `Última saída dia ${lastTransactionExpensives}`
             },
 
             total: {
@@ -150,12 +157,12 @@ export function Dashboard() {
 
                 <HighlightCards>
                     <HighlightCard
-                        type="down"
+                        type="up"
                         title="Entradas"
                         amount={highlightData.entries.amount}
                         lastTransaction={highlightData.entries.lastTransaction} />
                     <HighlightCard
-                        type="up"
+                        type="down"
                         title="Saídas"
                         amount={highlightData.expensives.amount}
                         lastTransaction={highlightData.expensives.lastTransaction} />
